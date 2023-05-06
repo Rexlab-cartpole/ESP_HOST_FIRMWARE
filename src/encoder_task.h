@@ -15,6 +15,9 @@ const float ENCODER_LINEAR_ANGULAR_RATIO = 0.00602f;
 const float ENCODER_ELBOW_ANGULAR_RATIO= 0.2f;
 const float ENCODER_SHOULDER_ANGULAR_RATIO = 1.0f;
 
+const float lowPass = 0.1f;
+const float lowPass2 = 0.3f;
+
 void encoder_setup();
 void encoder_task(void *pvParameters);
 encoderPositions_t encoder_getEncoderPositions(bool debug);

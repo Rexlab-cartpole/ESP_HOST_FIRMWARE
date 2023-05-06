@@ -2,6 +2,7 @@
 
 /********** Private Vars *************/
 commputer_commands_t computer_command;
+const TickType_t xDelaySerial = 2 / portTICK_PERIOD_MS;
 
 /********** Public Functions *************/
 commputer_commands_t serial_getLatestComputerCommands(){
@@ -16,12 +17,13 @@ static void serial_readComputerCommands();
 
 bool dbg = false;
 void serial_task(void* pv){
-    while(1){
+    // while(1){
         serial_sendEncoderPositions();
         serial_readComputerCommands();
 
-        vTaskDelay(5);
-    }
+        // vTaskDelay(5);
+        // vTaskDelay(xDelaySerial);
+    // }
 }
 
 
@@ -29,38 +31,39 @@ void serial_sendEncoderPositions(){
     encoderPositions_t position = encoder_getEncoderPositions(dbg);
 
     char buffer[100];
+    uint8_t prescision = 3;
     
-    dtostrf(position.linearRailPosition, 5, 3, buffer);
+    dtostrf(position.linearRailPosition, 5, prescision, buffer);
     Serial.print(buffer);
     Serial.print(",");
 
-    dtostrf(position.linearRailVelocity, 5, 3, buffer);
+    dtostrf(position.linearRailVelocity, 5, prescision, buffer);
     Serial.print(buffer);
     Serial.print(",");
 
-    dtostrf(position.shoulderPosition, 5, 3, buffer);
+    dtostrf(position.shoulderPosition, 5, prescision, buffer);
     Serial.print(buffer);
     Serial.print(",");
 
-    dtostrf(position.shoulderVelocity, 5, 3, buffer);
+    dtostrf(position.shoulderVelocity, 5, prescision, buffer);
     Serial.print(buffer);
     Serial.print(",");
 
-    dtostrf(position.elbowPosition, 5, 3, buffer);
+    dtostrf(position.elbowPosition, 5, prescision, buffer);
     Serial.print(buffer);
     Serial.print(",");
 
-    dtostrf(position.elbowVelocity, 5, 3, buffer);
+    dtostrf(position.elbowVelocity, 5, prescision, buffer);
     Serial.print(buffer);
     Serial.print(",");
 
-    dtostrf(computer_command.linearAccel, 5, 3, buffer);
-    Serial.print(buffer);
-    Serial.print(",");
+    // dtostrf(computer_command.linearAccel, 5, 3, buffer);
+    // Serial.print(buffer);
+    // Serial.print(",");
 
-    dtostrf(computer_command.elbowAccel, 5, 3, buffer);
-    Serial.print(buffer);
-    Serial.print(",");
+    // dtostrf(computer_command.elbowAccel, 5, 3, buffer);
+    // Serial.print(buffer);
+    // Serial.print(",");
 
     Serial.println();
 

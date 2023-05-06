@@ -60,7 +60,7 @@ void motor_task(void *pvParameters){
         linearStepper.run();
         elbowStepper.run();
 
-        vTaskDelay(0);
+        // vTaskDelay(0);
     }
 }
 

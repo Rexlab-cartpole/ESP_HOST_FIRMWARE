@@ -7,7 +7,8 @@ extern void motor_task(void *pvParameters);
 extern void encoder_task(void *pvParameters);
 
 void setup() {
-  Serial.begin(115200);
+  // Serial.begin(115200);
+  Serial.begin(38400);
 
   encoder_setup();
 
@@ -20,23 +21,34 @@ void setup() {
   * Screen display
   */
 
-  xTaskCreate(
-    serial_task,
-    "Serial Task",
-    1000,
-    NULL,
-    1,
-    NULL
-  );
+  // xTaskCreatePinnedToCore(
+  //   serial_task,
+  //   "Serial Task",
+  //   1000,
+  //   NULL,
+  //   1,
+  //   NULL,
+  //   0
+  // );
 
-  xTaskCreate(
+  xTaskCreatePinnedToCore(
     motor_task,
     "Motor Task",
     1000,
     NULL,
     1,
-    NULL
+    NULL,
+    1
   );
+
+  // xTaskCreate(
+  //   motor_task,
+  //   "Motor Task",
+  //   1000,
+  //   NULL,
+  //   1,
+  //   NULL
+  // );
 
   // xTaskCreate(
   //   encoder_task,
@@ -50,6 +62,7 @@ void setup() {
 
 void loop() {
   encoder_task(NULL);
+  serial_task(NULL);
 }
 
 
