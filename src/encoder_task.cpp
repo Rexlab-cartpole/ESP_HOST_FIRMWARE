@@ -109,13 +109,13 @@ void enableShoulderEncoder(){
 }
 
 void enableElbowEncoder(){
-    digitalWrite(controlPin, LOW); // active low // enabled here
-    digitalWrite(controlPin2, HIGH); // active low
+    digitalWrite(controlPin, HIGH); // active low
+    digitalWrite(controlPin2, LOW); // active low // enabled here
     digitalWrite(controlPin3, LOW); // active high
 }
 
 void enableLinearEncoder(){
-    digitalWrite(controlPin, HIGH); // active low
-    digitalWrite(controlPin2, LOW); // active low // enabled here
+    digitalWrite(controlPin, LOW); // active low // enabled here
+    digitalWrite(controlPin2, HIGH); // active low
     digitalWrite(controlPin3, LOW); // active high
 }

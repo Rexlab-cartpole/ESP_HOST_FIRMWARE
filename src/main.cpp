@@ -1,3 +1,16 @@
+/*
+
+Ideas: 
+* Run motor task in core 0 since main loop is on core 1
+* use biuffering to avoid serial prints: https://www.forward.com.au/pfod/ArduinoProgramming/RealTimeArduino/index.html
+* Profile each of the tasks using the above
+* use fast accel
+* use a semaphore for serial-motor command updates
+* try moving encoder task to rtos with watchdogs disabled
+
+*/
+
+
 #include <Arduino.h>
 
 extern void encoder_setup();
@@ -8,7 +21,8 @@ extern void encoder_task(void *pvParameters);
 
 void setup() {
   // Serial.begin(115200);
-  Serial.begin(38400);
+  // Serial.begin(38400);
+  Serial.begin(256000);
 
   encoder_setup();
 
