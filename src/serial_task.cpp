@@ -30,6 +30,7 @@ void serial_task(void* pv){
 void serial_sendEncoderPositions(){
     encoderPositions_t position = encoder_getEncoderPositions(dbg);
 
+    uint32_t start = micros();
     char buffer[100];
     uint8_t prescision = 3;
     
@@ -57,13 +58,17 @@ void serial_sendEncoderPositions(){
     Serial.print(buffer);
     Serial.print(",");
 
-    // dtostrf(computer_command.linearAccel, 5, 3, buffer);
-    // Serial.print(buffer);
-    // Serial.print(",");
+    dtostrf(computer_command.linearAccel, 5, 3, buffer);
+    Serial.print(buffer);
+    Serial.print(",");
 
-    // dtostrf(computer_command.elbowAccel, 5, 3, buffer);
-    // Serial.print(buffer);
-    // Serial.print(",");
+    dtostrf(computer_command.elbowAccel, 5, 3, buffer);
+    Serial.print(buffer);
+    Serial.print(",");
+
+    Serial.print(micros() - start);
+    Serial.print(",");
+
 
     Serial.println();
 

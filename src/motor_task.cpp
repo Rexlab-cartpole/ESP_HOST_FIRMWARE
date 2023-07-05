@@ -3,64 +3,75 @@
 
 
 void motor_task(void *pvParameters){
-    linearStepper.setMaxSpeed(5000.0);
-    elbowStepper.setMaxSpeed(5000.0);
+    engine.init();
+
+    elbowStepper = engine.stepperConnectToPin(elbowStepperPin2);
+    elbowStepper->setDirectionPin(elbowStepperPin1);
+    linearStepper = engine.stepperConnectToPin(linearStepperPin2);
+    linearStepper->setDirectionPin(linearStepperPin1);
+
+    elbowStepper->setSpeedInHz(0);  // the parameter is us/step !!!
+    elbowStepper->setAcceleration(100000);
+    linearStepper->setSpeedInHz(0);  // the parameter is us/step !!!
+    linearStepper->setAcceleration(100000);
+
+    // // wiggle test
+    // bool flag = true;
+    // int count = 0;
+    // const int thresh = 100;
+    // while(1){
+    //     if (flag){
+    //         // linearStepper->move(1000);
+    //         elbowStepper->move(1000);
+    //         linearStepper->move(1000);
+    //         flag = false;
+    //         Serial.println("Moving forward");
+    //         delay(2500);
+    //     }
+    //     else{
+    //         // linearStepper->move(0);
+    //         elbowStepper->move(-1000);
+    //         linearStepper->move(-1000);
+    //         flag = true;
+    //         Serial.println("Moving backward");
+    //         delay(2500);
+    //     }
+    // }
 
     while(1){
         commputer_commands_t computerCommand = serial_getLatestComputerCommands();
 
-        // if (computerCommand.linearAccel < 0){
-        //     linearStepper.setSpeed(-4000);
-        // }
-        // else if(computerCommand.linearAccel > 0){
-        //     linearStepper.setSpeed(4000);
-        // }
-        // else{
-        //     linearStepper.setSpeed(0);
-        // }
-
-        // if (computerCommand.elbowAccel < 0){
-        //     elbowStepper.setSpeed(-4000);
-        // }
-        // else if(computerCommand.elbowAccel > 0){
-        //     elbowStepper.setSpeed(4000);
-        // }
-        // else{
-        //     elbowStepper.setSpeed(0);
-        // }
-
-        // linearStepper.setAcceleration(computerCommand.linearAccel);
-        // elbowStepper.setAcceleration(computerCommand.elbowAccel);
-
-
         if (computerCommand.linearAccel < 0){
-            linearStepper.setAcceleration(-20000);
+            // linearStepper->stopMove();
+            linearStepper->runBackward();
         }
         else if(computerCommand.linearAccel > 0){
-            linearStepper.setAcceleration(20000);
+            // linearStepper->stopMove();
+            linearStepper->runForward();
+            // delay(1000);
         }
         else{
-            // linearStepper.setAcceleration(0);
+            linearStepper->stopMove();
         }
 
         if (computerCommand.elbowAccel < 0){
-            elbowStepper.setAcceleration(-20000);
+            // elbowStepper->stopMove();
+            elbowStepper->runBackward();
+            // delay(1000);
         }
         else if(computerCommand.elbowAccel > 0){
-            elbowStepper.setAcceleration(20000);
+            // elbowStepper->stopMove();
+            elbowStepper->runForward();
+            // delay(1000);
         }
         else{
-            // elbowStepper.setAcceleration(0);
+            elbowStepper->stopMove();
         }
 
-        linearStepper.setSpeed(computerCommand.linearAccel);
-        elbowStepper.setSpeed(computerCommand.elbowAccel);
-
-
-        linearStepper.run();
-        elbowStepper.run();
-
-        // vTaskDelay(0);
+        linearStepper->setSpeedInHz(abs(computerCommand.linearAccel));
+        elbowStepper->setSpeedInHz(abs(computerCommand.elbowAccel));
+        elbowStepper->setAcceleration(100000);
+        linearStepper->setAcceleration(100000);
     }
 }
 
