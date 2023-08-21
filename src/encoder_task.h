@@ -15,7 +15,8 @@ const float ENCODER_LINEAR_ANGULAR_RATIO = 0.00602f;
 const float ENCODER_ELBOW_ANGULAR_RATIO= 0.2f;
 const float ENCODER_SHOULDER_ANGULAR_RATIO = 1.0f;
 
-const float lowPass = 0.1f;
+const float lowPass3 = 0.05f;
+const float lowPass = 0.4f;
 const float lowPass2 = 0.3f;
 
 void encoder_setup();

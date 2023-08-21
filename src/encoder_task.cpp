@@ -46,16 +46,16 @@ void encoder_task(void* pv){
         delayMicroseconds(100);
         encoderReadingsRaw.shoulderPositionRaw = (lowPass2 * as5600_2.getCumulativePosition())
                                                  + (1.0f - lowPass2) * encoderReadingsRaw.shoulderPositionRaw;
-        encoderReadingsRaw.shoulderVelocityRaw = (lowPass * as5600_2.getAngularSpeed(AS5600_MODE_RADIANS))
-                                                 + (1.0f - lowPass) * encoderReadingsRaw.shoulderVelocityRaw;
+        encoderReadingsRaw.shoulderVelocityRaw = (lowPass3 * as5600_2.getAngularSpeed(AS5600_MODE_RADIANS))
+                                                 + (1.0f - lowPass3) * encoderReadingsRaw.shoulderVelocityRaw;
         // delay(1);
 
-        enableElbowEncoder();
-        delayMicroseconds(100);
-        encoderReadingsRaw.elbowPositionRaw = (lowPass2 * as5600_3.getCumulativePosition())
-                                               + (1.0f - lowPass2) * encoderReadingsRaw.elbowPositionRaw;
-        encoderReadingsRaw.elbowVelocityRaw = (lowPass * as5600_3.getAngularSpeed(AS5600_MODE_RADIANS))
-                                              + (1.0f - lowPass) * encoderReadingsRaw.elbowVelocityRaw;
+        // enableElbowEncoder();
+        // delayMicroseconds(100);
+        // encoderReadingsRaw.elbowPositionRaw = (lowPass2 * as5600_3.getCumulativePosition())
+        //                                        + (1.0f - lowPass2) * encoderReadingsRaw.elbowPositionRaw;
+        // encoderReadingsRaw.elbowVelocityRaw = (lowPass * as5600_3.getAngularSpeed(AS5600_MODE_RADIANS))
+        //                                       + (1.0f - lowPass) * encoderReadingsRaw.elbowVelocityRaw;
 
 
         processEncoderReadings();

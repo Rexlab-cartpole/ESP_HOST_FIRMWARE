@@ -38,34 +38,44 @@ void motor_task(void *pvParameters){
     //     }
     // }
 
+    float last_valid = 0.0f;
+    
     while(1){
         commputer_commands_t computerCommand = serial_getLatestComputerCommands();
+        if (computerCommand.linearAccel < 10.0f && computerCommand.linearAccel > -10.0f){
+            computerCommand.linearAccel = last_valid;
+        }
+        else{
+            last_valid = computerCommand.linearAccel; 
+        }
 
-        if (computerCommand.linearAccel < 0){
+        if (computerCommand.linearAccel < 0.0f){
             // linearStepper->stopMove();
             linearStepper->runBackward();
         }
-        else if(computerCommand.linearAccel > 0){
+        else if(computerCommand.linearAccel > 0.0f){
             // linearStepper->stopMove();
             linearStepper->runForward();
             // delay(1000);
         }
         else{
-            linearStepper->stopMove();
+            // linearStepper->stopMove();
+            // linearStepper->runForward();
         }
 
-        if (computerCommand.elbowAccel < 0){
+        if (computerCommand.elbowAccel < 0.0f){
             // elbowStepper->stopMove();
             elbowStepper->runBackward();
             // delay(1000);
         }
-        else if(computerCommand.elbowAccel > 0){
+        else if(computerCommand.elbowAccel > 0.0f){
             // elbowStepper->stopMove();
             elbowStepper->runForward();
             // delay(1000);
         }
         else{
-            elbowStepper->stopMove();
+            // elbowStepper->stopMove();
+            // linearStepper->runForward();
         }
 
         linearStepper->setSpeedInHz(abs(computerCommand.linearAccel));

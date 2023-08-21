@@ -109,6 +109,7 @@ void recvWithStartEndMarkers() {
                 recvInProgress = false;
                 ndx = 0;
                 newData = true;
+                Serial.flush();
             }
         }
 
