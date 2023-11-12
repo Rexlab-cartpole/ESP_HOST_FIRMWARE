@@ -1,36 +1,31 @@
-#include "serial_task.h"
+#include <Arduino.h>
+#include "common_types.h"
+
+extern encoderPositions_t encoder_getEncoderPositions(bool debug);
+
+computer_commands_t serial_getLatestComputerCommands();
+static void serial_readComputerCommands();
 
 /********** Private Vars *************/
-commputer_commands_t computer_command;
+static computer_commands_t computer_command;
 const TickType_t xDelaySerial = 2 / portTICK_PERIOD_MS;
+static int last_computer_command = 0;
 
 /********** Public Functions *************/
-commputer_commands_t serial_getLatestComputerCommands(){
+computer_commands_t serial_getLatestComputerCommands(){
+    serial_readComputerCommands();
+
+    // timeout feature
+    // if (millis() - last_computer_command > CONTROL_TIMEOUT_MS){
+    //     computer_command.linearTorque = 0;
+    //     computer_command.elbowTorque = 0;
+    // }
+
     return computer_command;
 }
 
-/********** Private Functions *************/
-static void serial_sendEncoderPositions();
-static void serial_readComputerCommands();
 
-
-
-bool dbg = false;
-void serial_task(void* pv){
-    // while(1){
-        serial_sendEncoderPositions();
-        serial_readComputerCommands();
-
-        // vTaskDelay(5);
-        // vTaskDelay(xDelaySerial);
-    // }
-}
-
-
-void serial_sendEncoderPositions(){
-    encoderPositions_t position = encoder_getEncoderPositions(dbg);
-
-    uint32_t start = micros();
+void serial_sendEncoderPositions(encoderPositions_t position){
     char buffer[100];
     uint8_t prescision = 3;
     
@@ -58,22 +53,18 @@ void serial_sendEncoderPositions(){
     Serial.print(buffer);
     Serial.print(",");
 
-    dtostrf(computer_command.linearAccel, 5, 3, buffer);
+    dtostrf(computer_command.linearTorque, 5, 3, buffer);
     Serial.print(buffer);
     Serial.print(",");
 
-    dtostrf(computer_command.elbowAccel, 5, 3, buffer);
+    dtostrf(computer_command.elbowTorque, 5, 3, buffer);
     Serial.print(buffer);
     Serial.print(",");
-
-    Serial.print(micros() - start);
-    Serial.print(",");
-
 
     Serial.println();
-
 }
 
+/********** Private Functions *************/
 
 // Serial parsing example from https://forum.arduino.cc/t/serial-input-basics-updated/382007/11
 // ****** Serial parsing. Intentionally left minimally modified to preserve tracability to original source. ******
@@ -84,7 +75,6 @@ static char tempChars[numChars];        // temporary array for use when parsing
 
 // variables to hold the parsed data
 static boolean newData = false;
-
 
 void recvWithStartEndMarkers() {
     static boolean recvInProgress = false;
@@ -124,18 +114,10 @@ void parseData() {      // split the data into its parts
     char * strtokIndx; // this is used by strtok() as an index
 
     strtokIndx = strtok(tempChars,",");      // get the first part - the string
-    computer_command.linearAccel = atof(strtokIndx);     // convert this part to an integer
+    computer_command.linearTorque = atof(strtokIndx);     // convert this part to an integer
 
     strtokIndx = strtok(NULL, ",");
-    computer_command.elbowAccel = atof(strtokIndx);     // convert this part to a float
-
-    // if (computer_command.linearAccel == 12.5 && computer_command.shoulderAccel == -13.5){
-    //     dbg = true;
-    // }
-    // else{
-    //     dbg = false;
-    // }
-
+    computer_command.elbowTorque = atof(strtokIndx);     // convert this part to a float
 }
 
 void serial_readComputerCommands(){
@@ -144,6 +126,6 @@ void serial_readComputerCommands(){
         strcpy(tempChars, receivedChars);
         parseData();
         newData = false;
+        last_computer_command = millis();
     }
 }
-

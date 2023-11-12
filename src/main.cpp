@@ -10,73 +10,83 @@ Ideas:
 
 */
 
-
 #include <Arduino.h>
+#include "common_types.h"
 
-extern void encoder_setup();
+// MOTOR CONTROL
+extern void setMotorTorque(computer_commands_t commands);
+extern computer_commands_t safety_check(computer_commands_t commands, encoderPositions_t positions);
+extern void motorSetup();
+extern void homingRoutine();
+extern void enableMotors();
+extern void disableMotors();
 
-extern void serial_task(void *pvParameters);
-extern void motor_task(void *pvParameters);
-extern void encoder_task(void *pvParameters);
+// ENCODER READING
+extern void encoderSetup();
+extern encoderPositions_t getEncoderPositionsScaled();
 
-void setup() {
-  // Serial.begin(115200);
-  // Serial.begin(38400);
+// SERIAL
+extern computer_commands_t serial_getLatestComputerCommands();
+extern void serial_sendEncoderPositions(encoderPositions_t position);
+
+controllerState_e controllerState;
+
+void setup () { 
+  controllerState = controllerState_e::INIT;
+
   Serial.begin(256000);
+  // while (!Serial) {;}
+  Serial.println("Controller Alive");
 
-  encoder_setup();
+#ifdef VESC_DEBUG
+  #ifdef VESC_DEBUG_LINEAR
+    Serial1.begin(115200, SERIAL_8N1, LINEAR_MOTOR_SERIAL, 0);
+  #endif
+  #ifdef VESC_DEBUG_ELBOW
+    Serial1.begin(115200, SERIAL_8N1, ELBOW_MOTOR_SERIAL, 0);
+  #endif
+#endif
 
-  /*
-  Tasks: 
+  motorSetup();
+  disableMotors();
 
-  * Serial communication
-  * Motor control
-  * Sensor reading
-  * Screen display
-  */
+  encoderSetup();
 
-  // xTaskCreatePinnedToCore(
-  //   serial_task,
-  //   "Serial Task",
-  //   1000,
-  //   NULL,
-  //   1,
-  //   NULL,
-  //   0
-  // );
+  delay(5000); // Let the motors calibrate themselves
+  setMotorTorque({0,0});
+  enableMotors();
+  delay(5000); // Let the Motor controller initialize to 0
 
-  xTaskCreatePinnedToCore(
-    motor_task,
-    "Motor Task",
-    1000,
-    NULL,
-    1,
-    NULL,
-    1
-  );
 
-  // xTaskCreate(
-  //   motor_task,
-  //   "Motor Task",
-  //   1000,
-  //   NULL,
-  //   1,
-  //   NULL
-  // );
+  controllerState = controllerState_e::HOMING;
+  Serial.println("starting homing");
+  homingRoutine();
+  Serial.println("ending homing");
+  controllerState = controllerState_e::IDLE;
 
-  // xTaskCreate(
-  //   encoder_task,
-  //   "Encoder Task",
-  //   1000,
-  //   NULL,
-  //   1,
-  //   NULL
-  // );
+  Serial.println("Setup complete");
 }
 
-void loop() {
-  encoder_task(NULL);
-  serial_task(NULL);
-}
+void loop () { 
+  unsigned long loop_start = micros();
 
+  encoderPositions_t positions = getEncoderPositionsScaled();
 
+  serial_sendEncoderPositions(positions);
+  computer_commands_t commands = serial_getLatestComputerCommands();
+
+  commands = safety_check(commands, positions);
+  setMotorTorque(commands);
+
+#ifdef VESC_DEBUG
+  Serial.print("VESC: ");
+  Serial.println(Serial1.readStringUntil('\n'));
+#endif
+
+  // use a smarter delay for loop aware control period timing
+  uint32_t smart_delay = CONTROL_PERIOD_US - (micros() - loop_start);
+  if (smart_delay < 0) smart_delay = 0;
+  // Serial.print("smart_delay: ");
+  // Serial.println(smart_delay);
+  delayMicroseconds(smart_delay);
+} 
