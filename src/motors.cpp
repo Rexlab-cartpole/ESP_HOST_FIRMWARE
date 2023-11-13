@@ -32,10 +32,15 @@ void homingRoutine(){
     computer_commands_t c;
     c.elbowTorque = 0;
 
+    // break stiction
+    c.linearTorque = -HOMING_INITIAL_TORQUE * 2;
+    setMotorTorque(c);
+    delay(100);
+
     // Fast home
     while(readEndstop() == false){
         Serial.println("looking for home position");
-        c.linearTorque = -HOMING_INITIAL_TORQUE;
+        c.linearTorque = -HOMING_INITIAL_TORQUE * 0.8f;
         setMotorTorque(c);
         #ifdef VESC_DEBUG
             Serial.print("VESC: ");
@@ -45,41 +50,18 @@ void homingRoutine(){
     Serial.println("found home position");
     c.linearTorque = 0;
     setMotorTorque(c);
-    delay(100);
-
-    // backoff
-    c.linearTorque = HOMING_INITIAL_TORQUE;
-    Serial.println("Backing off");
-    setMotorTorque(c);
-    delay(500);
-    c.linearTorque = 0;
-    setMotorTorque(c);
-    delay(100);
-
-    // slow home
-    while(readEndstop() == false){
-        Serial.println("refining home position");
-        c.linearTorque = -HOMING_SLOW_TORQUE;
-        setMotorTorque(c);
-        #ifdef VESC_DEBUG
-            Serial.print("VESC: ");
-            Serial.println(Serial1.readStringUntil('\n'));
-        #endif
-    }
-    c.linearTorque = 0;
-    setMotorTorque(c);
-    delay(100);
+    delay(10);
 
     zeroLinearRailEncoder();
 
     // final backoff to center rail
-    c.linearTorque = HOMING_INITIAL_TORQUE;
+    c.linearTorque = HOMING_INITIAL_TORQUE * 2.5;
     setMotorTorque(c);
-    delay(2000);
+    delay(500);
 
     c.linearTorque = 0;
     setMotorTorque(c);
-    delay(100);
+    delay(10);
 }
 
 void setMotorTorque(computer_commands_t commands){
@@ -87,9 +69,6 @@ void setMotorTorque(computer_commands_t commands){
     // do a manual map. MAP() arduino built in function is messed up
     float linear_voltage = 255 * ((commands.linearTorque - MIN_TORQUE) / (MAX_TORQUE - MIN_TORQUE));
     float elbow_voltage = 255 * ((commands.elbowTorque - MIN_TORQUE) / (MAX_TORQUE - MIN_TORQUE));
-
-    Serial.print("linear_voltage: ");
-    Serial.println(linear_voltage);
 
     dacWrite(LINEAR_MOTOR_PWM, (int) linear_voltage);
     dacWrite(ELBOW_MOTOR_PWM, (int) elbow_voltage);

@@ -16,10 +16,10 @@ computer_commands_t serial_getLatestComputerCommands(){
     serial_readComputerCommands();
 
     // timeout feature
-    // if (millis() - last_computer_command > CONTROL_TIMEOUT_MS){
-    //     computer_command.linearTorque = 0;
-    //     computer_command.elbowTorque = 0;
-    // }
+    if (millis() - last_computer_command > CONTROL_TIMEOUT_MS){
+        computer_command.linearTorque = 0;
+        computer_command.elbowTorque = 0;
+    }
 
     return computer_command;
 }

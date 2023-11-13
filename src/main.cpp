@@ -34,7 +34,7 @@ controllerState_e controllerState;
 void setup () { 
   controllerState = controllerState_e::INIT;
 
-  Serial.begin(256000);
+  Serial.begin(115200);
   // while (!Serial) {;}
   Serial.println("Controller Alive");
 
@@ -86,7 +86,9 @@ void loop () {
   // use a smarter delay for loop aware control period timing
   uint32_t smart_delay = CONTROL_PERIOD_US - (micros() - loop_start);
   if (smart_delay < 0) smart_delay = 0;
+  if (smart_delay > CONTROL_PERIOD_US) smart_delay = 0; // handle overflow since the previous line would never happen
   // Serial.print("smart_delay: ");
   // Serial.println(smart_delay);
   delayMicroseconds(smart_delay);
 } 
+

@@ -21,16 +21,24 @@ void encoderSetup(){
 }
 
 encoderPositions_t getEncoderPositionsScaled(){
-    encoderPositions_t positions;
+    static encoderPositions_t lastPositions;
+    static unsigned long lastTime = 0;
 
+    encoderPositions_t positions;
     positions.elbowPosition = (elbowEncoder.getCount() * ELBOW_SCALE) + ELBOW_OFFSET;
     positions.linearRailPosition = (linearEncoder.getCount() * LINEAR_SCALE) + LINEAR_OFFSET;
     positions.shoulderPosition = (shoulderEncoder.getCount() * SHOULDER_SCALE) + SHOULDER_OFFSET;
 
-    // TODO: Update
-    positions.elbowVelocity = 0.0f;
-    positions.linearRailVelocity = 0.0f;
-    positions.shoulderVelocity = 0.0f;
+    unsigned long elapsed_time = micros() - lastTime; 
+    positions.elbowVelocity = 1000000 * (positions.elbowPosition - lastPositions.elbowPosition) / elapsed_time;
+    positions.linearRailVelocity = 1000000 * (positions.linearRailPosition - lastPositions.linearRailPosition) / elapsed_time;
+    positions.shoulderVelocity = 1000000 * (positions.shoulderPosition - lastPositions.shoulderPosition) / elapsed_time;
+    
+    // static variable memory saving
+    lastPositions.elbowPosition = positions.elbowPosition;
+    lastPositions.linearRailPosition = positions.linearRailPosition;
+    lastPositions.shoulderPosition = positions.shoulderPosition; 
+    lastTime = micros();
 
     return positions;
 }

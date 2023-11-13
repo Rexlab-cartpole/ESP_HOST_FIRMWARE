@@ -2,8 +2,8 @@
 
 #define PI2 6.28318f
 
-#define VESC_DEBUG 1 // Set to 1 to enable VESC debugging
-#define VESC_DEBUG_LINEAR 1 // Set to 1 to enable VESC debugging for linear motor, 0 for elbow
+// #define VESC_DEBUG 1 // Set to 1 to enable VESC debugging
+// #define VESC_DEBUG_LINEAR 1 // Set to 1 to enable VESC debugging for linear motor, 0 for elbow
 // #define VESC_DEBUG_ELBOW 1
 
 /*********** MOTOR DEFINITIONS *********/
@@ -20,11 +20,11 @@
 #endif
 
 // Constants
-#define HOMING_SLOW_TORQUE 1.0f
-#define HOMING_INITIAL_TORQUE 1.5f
+// #define HOMING_SLOW_TORQUE 0.2f
+#define HOMING_INITIAL_TORQUE 0.7f
 
-#define MIN_TORQUE -10.0f
-#define MAX_TORQUE 10.0f
+#define MIN_TORQUE -5.0f
+#define MAX_TORQUE 5.0f
 
 #define MAX_ANGLE_SHOULDER 360 * 2
 #define MIN_ANGLE_SHOULDER - 360 * 2
