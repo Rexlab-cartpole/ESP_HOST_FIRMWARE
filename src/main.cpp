@@ -31,6 +31,11 @@ extern void serial_sendEncoderPositions(encoderPositions_t position);
 
 controllerState_e controllerState;
 
+#include <NeoPixelBus.h>
+
+const uint16_t PixelCount = 4; // this example assumes 4 pixels, making it smaller will cause a failure
+const uint8_t PixelPin = 2;  // make sure to set this to the correct pin, ignored for Esp8266
+
 void setup () { 
   controllerState = controllerState_e::INIT;
 
@@ -71,9 +76,12 @@ void loop () {
   unsigned long loop_start = micros();
 
   encoderPositions_t positions = getEncoderPositionsScaled();
-
   serial_sendEncoderPositions(positions);
+
+  // Serial.print("vel: ");
+
   computer_commands_t commands = serial_getLatestComputerCommands();
+
 
   commands = safety_check(commands, positions);
   setMotorTorque(commands);
@@ -91,4 +99,3 @@ void loop () {
   // Serial.println(smart_delay);
   delayMicroseconds(smart_delay);
 } 
-

@@ -27,7 +27,7 @@ computer_commands_t serial_getLatestComputerCommands(){
 
 void serial_sendEncoderPositions(encoderPositions_t position){
     char buffer[100];
-    uint8_t prescision = 3;
+    uint8_t prescision = 5;
     
     dtostrf(position.linearRailPosition, 5, prescision, buffer);
     Serial.print(buffer);

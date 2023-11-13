@@ -37,7 +37,7 @@
 
 /*********** CONTROLLER DEFINITIONS *********/
 
-#define CONTROL_FREQ 100 // Hz
+#define CONTROL_FREQ 50 // Hz
 #define CONTROL_PERIOD_US 1000000/CONTROL_FREQ // us
 #define CONTROL_TIMEOUT_MS 100 // ms
 
@@ -63,6 +63,11 @@
 #define LINEAR_OFFSET 0
 #define SHOULDER_OFFSET 1.5f * PI
 
+
+/*********** VELOCITY FILTER *********/
+
+#define VEL_FILTER_BUF_SIZE 5
+
 /*********** ENUMS & STRUCTS *********/
 
 struct encoderPositions_t{
@@ -72,6 +77,10 @@ struct encoderPositions_t{
     float shoulderVelocity; // in degrees/s
     float elbowPosition; // in degrees
     float elbowVelocity; // in degrees/s
+
+    float linearRailVelocities[VEL_FILTER_BUF_SIZE];
+    float shoulderVelocities[VEL_FILTER_BUF_SIZE];
+    float elbowVelocities[VEL_FILTER_BUF_SIZE];
 };
 
 struct computer_commands_t{

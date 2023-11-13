@@ -57,7 +57,7 @@ void homingRoutine(){
     // final backoff to center rail
     c.linearTorque = HOMING_INITIAL_TORQUE * 2.5;
     setMotorTorque(c);
-    delay(500);
+    delay(450);
 
     c.linearTorque = 0;
     setMotorTorque(c);
